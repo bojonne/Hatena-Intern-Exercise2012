@@ -121,8 +121,8 @@ my $expected = <<'HTML';
 HTML
 
 cmp_ok $template->render({
-    title   => 'タイトル',
-    content => 'これはコンテンツです。&<>"',
+    year   => '2012',
+    month => '8&<>"',
 }), 'eq', $expected; 
 
 done_testing();
