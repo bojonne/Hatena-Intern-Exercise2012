@@ -121,8 +121,8 @@ my $expected = <<'HTML';
 HTML
 
 cmp_ok $template->render({
-    year   => '2012',
     month => '8&<>"',
+    year   => '2012',
 }), 'eq', $expected; 
 
 done_testing();
