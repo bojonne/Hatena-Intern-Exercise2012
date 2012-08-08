@@ -1,18 +1,28 @@
 var Template = function(input) {
-    // ã“ã®é–¢æ•°ã‚’å®Ÿè£…ã—ã¦ãã ã•ã„
+    // ‚±‚ÌŠÖ”‚ğÀ‘•‚µ‚Ä‚­‚¾‚³‚¢
     var data = eval(input);
     this.source = data.source;
 };
 
 Template.prototype = {
     render: function(variables) {
-        // ã“ã®é–¢æ•°ã‚’å®Ÿè£…ã—ã¦ãã ã•ã„
-        var json = eval(variables);
-        var title = json.title;
-        var content = json.content;
-        
-        var html = this.source("{% title %}", title);
-        html = html.replace("{% content %}", content);
+        // ‚±‚ÌŠÖ”‚ğÀ‘•‚µ‚Ä‚­‚¾‚³‚¢
+        var escape = {
+			 '&': '&amp',
+  			 '<': '&lt',
+  			 '>': '&gt',
+  			 '"':'&quot',
+  			 "'":'&apos' 
+        };
+        var html = this.source;
+        for(key in variables){
+        	var keyword = variables[key] ;
+            for(ch in escape){
+        		keyword = keyword.replace(ch, escape[ch]);
+        	}
+        	var mark = "{% "+ key + " %}";
+        	html = html.replace(mark, keyword);
+        }        
         return html;
     }
 };

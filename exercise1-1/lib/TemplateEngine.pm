@@ -9,7 +9,6 @@ sub new{
 	#クラス名
 	my $this = shift;
 	my %arg = @_;
-	
 	my ($file) = $arg{'file'};
 	my $tmpl = {"file" => $file };
 	bless $tmpl, $this;
@@ -23,21 +22,40 @@ sub DESTROY{
 
 #renderメソッド
 sub render{
-	my $this = shift;
-	if( $_[0] ){
-		$this->{title} = $_[0];
-	}
-	my $title = $this->{title}->{title};
-	my $content = shift->{content};
-	#print "$title\n";
-	#print "$content\n";
+	my ($this, $data) = @_;
+	#HTMLリファレンス表
+	my %table = (
+	'&' => '&amp;',
+	'<' => '&lt;',
+	'>' => '&gt;',
+	'"' => '&quot;',
+	"'" => '&#39;',
+	);
+	#正規表現
+	my $regex = join '', '([', keys(%table), '])';
 	
 	#ファイル処理
-	open(FILE, "<:utf8",$this->{file}) or die "$!";
+	open(FILE, $this->{file}) or die "$!";
 	my @newfile =<FILE>;
+	
+	#リファレンス処理からraplace
+	my %content = %$data;
+	
+	#replace候補のエスケープ
+	foreach my $key (keys %content){
+		$content{$key} =~ s/$regex/$table{$1}/g;	
+	}
+		
+	#replace
 	foreach my $line (@newfile) {
-		$line =~ s/{% title %}/$title/g;
-		$line =~ s/{% content %}/$content/g;
+		foreach my $key (keys %content){
+			my $lf = "{% ";
+			my $rg = " %}";
+			my $str = $lf . $key . $rg;
+			#print "$str\n";
+			
+			$line =~ s/$str/$content{$key}/g;
+		}
 	}
 	close(FILE);
 	return @newfile;
